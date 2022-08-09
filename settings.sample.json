@@ -1,0 +1,10 @@
+{
+  "namespace": "test",
+  "unsafe_names": [
+    "polloncio",
+    "chanchito"
+  ],
+  "safe_names": [
+    "safe-"
+  ]
+}
