@@ -36,7 +36,7 @@ func easyjson6601e8cdDecodeTmpEasyjson(in *jlexer.Lexer, out *Settings) {
 			continue
 		}
 		switch key {
-		case "Namespace":
+		case "namespace":
 			out.Namespace = string(in.String())
 		case "unsafe_names":
 			if in.IsNull() {
@@ -99,7 +99,7 @@ func easyjson6601e8cdEncodeTmpEasyjson(out *jwriter.Writer, in Settings) {
 	first := true
 	_ = first
 	{
-		const prefix string = ",\"Namespace\":"
+		const prefix string = ",\"namespace\":"
 		out.RawString(prefix[1:])
 		out.String(string(in.Namespace))
 	}

@@ -12,8 +12,8 @@ import (
 
 // Valid function validates the case when you recovers the settings.json into an struct
 func (s *Settings) Valid() (bool, error) {
-	if s.Namespace != "" {
-		return false, errors.Errorf(`Please provide a destination "namespace"\n`)
+	if s.Namespace == "" {
+		return false, errors.Errorf(`Please provide a destination "namespace"`)
 	}
 
 	if len(s.UnsafeNames) == 0 && len(s.SafeNames) == 0 {
@@ -51,6 +51,8 @@ func (s *Settings) IsNameSafe(podName string) bool {
 	}
 	reservedBytes := len(DefaultSafePrefixes) + len(s.SafeNames)
 	var allSafeNames = make([]string, reservedBytes, reservedBytes)
+
+	allSafeNames = append(s.SafeNames, DefaultSafePrefixes...)
 
 	// If safename is declared, you are whitelisting by names
 	if len(s.SafeNames) == 0 {
