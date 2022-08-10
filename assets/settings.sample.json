@@ -1,0 +1,10 @@
+{
+  "namespace": "default",
+  "unsafe_names": [
+    "notsafe-",
+    "insecure-"
+  ],
+  "safe_names": [
+    "ocatopic"
+  ]
+}

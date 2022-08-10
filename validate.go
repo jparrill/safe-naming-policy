@@ -44,7 +44,7 @@ func validate(payload []byte) ([]byte, error) {
 	logger.DebugWithFields("validating pod object", func(e onelog.Entry) {
 		e.String("name", pod.Metadata.Name)
 		e.String("namespace", pod.Metadata.Namespace)
-		e.String("%s", string(pod))
+		//		e.String("%s", string(pod))
 	})
 
 	// From here starts the rules validations

@@ -1,0 +1,48 @@
+rules:
+- apiGroups: [""]
+  apiVersions: ["v1"]
+  resources: ["pods"]
+  operations: ["CREATE"]
+mutating: false
+contextAware: false
+executionMode: kubewarden-wapc
+annotations:
+  io.kubewarden.policy.title: safe-naming-policy
+  io.kubewarden.policy.description: This policy allow us to blacklist/whitelist podName in a concrete Namespace
+  io.kubewarden.policy.author: Juan Manuel Parrilla
+  io.kubewarden.policy.url: https://github.com/jparrill/safe-naming-policy
+  io.kubewarden.policy.source: https://github.com/jparrill/safe-naming-policy
+  io.kubewarden.policy.license: GPL-3.0
+  io.kubewarden.policy.usage: |
+    Safe Name Policy
+    ================
+
+    This policy allow us to Blacklist/Whitelist Pod Names in a concrete Kubernetes Namespace. The Validations uses `strings.Contains` to check the substring from the "safe_names" and "unsafe_names" statements, and are checked into a concrete "namespace".
+
+    The Settings file
+    _________________
+
+    The settings file contains these statements
+
+    ```json
+    {
+      "namespace": "test",
+      "unsafe_names": [
+        "notsafe-",
+        "insecure-"
+      ],
+      "safe_names": [
+        "safe-"
+      ]
+    }
+
+    ```
+
+    - **namespace**: Involves the Namespace the policy will cover. Also we have "some" prefixes already in a default slice which covers the most basics pod names to avoid issues with the current deployment. The default ones are: "kube", "cert-manager", "local-path-provisioner", "coredns", "traefik", "metrics-server", "policy-server-default".
+    - **unsafe_names**: This statement cover all the blacklisted pod name patterns. If you have there something like "insecure-", you will not be able to create pods with the name "insecure-*" in the declared Namespace. 
+        **Note**: This works fine with "safe_names" statement.
+    - **safe_names**: This statement will cover all the whitelisted pod name patterns. If you have something like "safe-", you will be able **ONLY* to raise pods with that prefix the the declared Namespace.
+        **Note**: This works fine with "unsafe_names" statement.
+
+    The evaluation process follows the next flow, first we check the **namespace**, then we go to check the **unsafe_names* statement and as a last step the **safe_names** statement.
+

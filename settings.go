@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	kubewarden "github.com/kubewarden/policy-sdk-go"
+	kp "github.com/kubewarden/policy-sdk-go/protocol"
 	easyjson "github.com/mailru/easyjson"
 	"github.com/pkg/errors"
 )
@@ -86,13 +87,13 @@ func (s *Settings) IsNameUnsafe(podName string) bool {
 	return false
 }
 
-func NewSettingsFromValidationReq(validationReq *kubewarden_protocol.ValidationRequest) (Settings, error) {
+func NewSettingsFromValidationReq(validationReq *kp.ValidationRequest) (Settings, error) {
 	settings := Settings{}
 	err := easyjson.Unmarshal(validationReq.Settings, &settings)
 	return settings, err
 }
 
-func (s *Settings) validateSettings(payload []byte) ([]byte, error) {
+func validateSettings(payload []byte) ([]byte, error) {
 	logger.Info("validating settings")
 
 	settings := Settings{}
