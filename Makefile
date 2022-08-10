@@ -23,7 +23,7 @@ test: types_easyjson.go
 
 .PHONY: e2e-tests
 e2e-tests: annotated-policy.wasm
-	bats e2e.bats
+	bats assets/e2e.bats
 
 .PHONY: clean
 clean:
