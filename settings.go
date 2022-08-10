@@ -6,12 +6,50 @@ import (
 
 	kubewarden "github.com/kubewarden/policy-sdk-go"
 	easyjson "github.com/mailru/easyjson"
+	"github.com/pkg/errors"
 )
+
+// Valid function validates the case when you recovers the settings.json into an struct
+func (s *Settings) Valid() (bool, error) {
+	if s.Namespace != "" {
+		return false, errors.Errorf(`Please provide a destination "namespace"\n`)
+	}
+
+	if len(s.UnsafeNames) == 0 && len(s.SafeNames) == 0 {
+		return false, errors.Errorf(`Please provide at least "unsafe_names" or "safe_names" slices`)
+	}
+
+	return true, nil
+}
+
+// Check if this is the namespace where should I look at.
+// If true, continue with other evaluations
+// If false, AcceptRequest
+func (s *Settings) IsThisMyNamespace(podNamespace string) bool {
+
+	if podNamespace == s.Namespace {
+		return true
+	}
+
+	return false
+}
 
 // IsNameSafe function looks for and match the podname with a slice of SafeNames
 // If the podname contains a subsrting with the settings.SafeNames[n], the controller
 // will allow the pod creation
 func (s *Settings) IsNameSafe(podName string) bool {
+
+	var DefaultSafePrefixes = []string{
+		"kube",
+		"cert-manager",
+		"local-path-provisioner",
+		"coredns",
+		"traefik",
+		"metrics-server",
+		"policy-server-default",
+	}
+	reservedBytes := len(DefaultSafePrefixes) + len(s.SafeNames)
+	var allSafeNames = make([]string, reservedBytes, reservedBytes)
 
 	// If safename is declared, you are whitelisting by names
 	if len(s.SafeNames) == 0 {
@@ -19,7 +57,7 @@ func (s *Settings) IsNameSafe(podName string) bool {
 	}
 
 	// Looks for the PodName in the Safe Pod Names
-	for _, sn := range s.SafeNames {
+	for _, sn := range allSafeNames {
 		if strings.Contains(podName, sn) {
 			return true
 		}
@@ -46,6 +84,12 @@ func (s *Settings) IsNameUnsafe(podName string) bool {
 	}
 
 	return false
+}
+
+func NewSettingsFromValidationReq(validationReq *kubewarden_protocol.ValidationRequest) (Settings, error) {
+	settings := Settings{}
+	err := easyjson.Unmarshal(validationReq.Settings, &settings)
+	return settings, err
 }
 
 func (s *Settings) validateSettings(payload []byte) ([]byte, error) {
