@@ -7,7 +7,6 @@ rules:
     - UPDATE
 mutating: false
 contextAware: false
-executionMode: kubewarden-wapc
 annotations:
   io.kubewarden.policy.title: safe-naming-policy
   io.kubewarden.policy.description: This policy allow us to blacklist/whitelist podName in a concrete Namespace
