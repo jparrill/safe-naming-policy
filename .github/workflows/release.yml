@@ -9,7 +9,7 @@ name: Release policy
 
 jobs:
   test:
-    name: run tests and linters
+    name: Run Golang Unit Tests 
     uses: kubewarden/github-actions/.github/workflows/reusable-test-policy-go.yml@v1
 
   release:
@@ -22,7 +22,7 @@ jobs:
         uses: kubewarden/github-actions/policy-build-go@v1
         with:
           metadata-file: 'assets/metadata.yml'
-      - name: Run e2e tests
+      - name: Run E2E tests
         run: |
           make e2e-tests
       - name: Release
