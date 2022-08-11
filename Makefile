@@ -8,7 +8,7 @@ policy-arm.wasm: $(SOURCE_FILES) go.mod go.sum types_easyjson.go
 	tinygo build -o policy.wasm -target=wasi -no-debug .
 
 policy.wasm: $(SOURCE_FILES) go.mod go.sum types_easyjson.go
-    docker run --rm -v ${PWD}:/src -w /src tinygo/tinygo:0.24.0 tinygo build -o policy.wasm -target=wasi -no-debug .
+	docker run --rm -v ${PWD}:/src -w /src tinygo/tinygo:0.24.0 tinygo build -o policy.wasm -target=wasi -no-debug .
 
 annotated-policy.wasm: policy.wasm assets/metadata.yml
 	kwctl annotate -m assets/metadata.yml -o annotated-policy.wasm policy.wasm
