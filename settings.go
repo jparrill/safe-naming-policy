@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"strings"
 
 	kubewarden "github.com/kubewarden/policy-sdk-go"
@@ -101,12 +100,12 @@ func validateSettings(payload []byte) ([]byte, error) {
 	settings := Settings{}
 	err := easyjson.Unmarshal(payload, &settings)
 	if err != nil {
-		return kubewarden.RejectSettings(kubewarden.Message(fmt.Sprintf("Provided settings are not valid: %v", err)))
+		return kubewarden.RejectSettings(kubewarden.Message("Provided settings are not valid"))
 	}
 
 	valid, err := settings.Valid()
 	if err != nil {
-		return kubewarden.RejectSettings(kubewarden.Message(fmt.Sprintf("Provided settings are not valid: %v", err)))
+		return kubewarden.RejectSettings(kubewarden.Message("Provided settings are not valid"))
 	}
 	if valid {
 		return kubewarden.AcceptSettings()

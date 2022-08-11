@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/francoispqt/onelog"
@@ -36,8 +35,7 @@ func validate(payload []byte) ([]byte, error) {
 	pod := &corev1.Pod{}
 	if err := easyjson.Unmarshal([]byte(podJSON), pod); err != nil {
 		return kubewarden.RejectRequest(
-			kubewarden.Message(
-				fmt.Sprintf("Cannot decode Pod object: %s", err.Error())),
+			kubewarden.Message("Cannot decode Pod object"),
 			kubewarden.Code(400))
 	}
 
@@ -61,8 +59,7 @@ func validate(payload []byte) ([]byte, error) {
 		})
 
 		return kubewarden.RejectRequest(
-			kubewarden.Message(
-				fmt.Sprintf("The '%s' pattern is blacklisted", pod.Metadata.Name)),
+			kubewarden.Message("The Unsafe pattern provided is blacklisted"),
 			kubewarden.NoCode)
 	}
 
@@ -74,8 +71,7 @@ func validate(payload []byte) ([]byte, error) {
 		})
 
 		return kubewarden.RejectRequest(
-			kubewarden.Message(
-				fmt.Sprintf("The '%s' pattern is not whitelisted", pod.Metadata.Name)),
+			kubewarden.Message("The Safe pattern provided is not whitelisted"),
 			kubewarden.NoCode)
 	}
 
