@@ -37,7 +37,7 @@ func TestSettingsValidNoLists(t *testing.T) {
 	if err := easyjson.Unmarshal(rawSettings, settings); err != nil {
 		t.Errorf("Unexpected error %+v", err)
 	}
-	result, _ := settings.Valid()
+	result := settings.Valid()
 	// Fails because we need at least one of the 2 statements (blacklist|whitelist)
 	assert.Equal(t, result, false)
 }
@@ -48,7 +48,7 @@ func TestSettingsValidNoNS(t *testing.T) {
 	if err := easyjson.Unmarshal(rawSettings, settings); err != nil {
 		t.Errorf("Unexpected error %+v", err)
 	}
-	result, _ := settings.Valid()
+	result := settings.Valid()
 	// Fails because we need at least the NS and 1 statement
 	assert.Equal(t, result, false)
 }
