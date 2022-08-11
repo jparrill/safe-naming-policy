@@ -6,20 +6,19 @@ import (
 	kubewarden "github.com/kubewarden/policy-sdk-go"
 	kp "github.com/kubewarden/policy-sdk-go/protocol"
 	easyjson "github.com/mailru/easyjson"
-	"github.com/pkg/errors"
 )
 
 // Valid function validates the case when you recovers the settings.json into an struct
-func (s *Settings) Valid() (bool, error) {
+func (s *Settings) Valid() bool {
 	if s.Namespace == "" {
-		return false, errors.Errorf(`Please provide a destination "namespace"`)
+		return false
 	}
 
 	if len(s.UnsafeNames) == 0 && len(s.SafeNames) == 0 {
-		return false, errors.Errorf(`Please provide at least "unsafe_names" or "safe_names" slices`)
+		return false
 	}
 
-	return true, nil
+	return true
 }
 
 // Check if this is the namespace where should I look at.
@@ -103,7 +102,7 @@ func validateSettings(payload []byte) ([]byte, error) {
 		return kubewarden.RejectSettings(kubewarden.Message("Provided settings are not valid"))
 	}
 
-	valid, err := settings.Valid()
+	valid := settings.Valid()
 	if err != nil {
 		return kubewarden.RejectSettings(kubewarden.Message("Provided settings are not valid"))
 	}
