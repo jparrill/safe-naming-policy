@@ -13,6 +13,7 @@ jobs:
     uses: kubewarden/github-actions/.github/workflows/reusable-test-policy-go.yml@v1
 
   release:
+    name: Kubewarden policy Release
     needs: test
     runs-on: ubuntu-latest
     steps:
@@ -47,11 +48,13 @@ jobs:
         env:
           COSIGN_EXPERIMENTAL: 1
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+          ANNOTATED_WASM: annotated-policy.wasm
+          OCI_TARGET: ghcr.io/${{ github.repository_owner }}/kubewarden-policies/safe-naming-policy
         run: |
           set -ex
           echo Pushing policy to OCI container registry
-          IMMUTABLE_REF=$(kwctl push -o json ${{ inputs.annotated-wasm }} ${{ inputs.oci-target }}:latest | jq -r .immutable_ref)
-          echo Keyless signing of policy using cosign
+          IMMUTABLE_REF=$(kwctl push -o json ${{ env.ANNOTATED_WASM }} ${{ env.OCI_TARGET }}:latest | jq -r .immutable_ref)
+          echo Key signing of policy using cosign
           cosign sign --key cosign.key ${IMMUTABLE_REF}
 
       - name: Create Release
@@ -72,9 +75,10 @@ jobs:
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
+          ANNOTATED_WASM: annotated-policy.wasm
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ inputs.annotated-wasm }}
+          asset_path: ${{ env.ANNOTATED_WASM }}
           asset_name: policy.wasm
           asset_content_type: application/wasm
       -
@@ -83,4 +87,4 @@ jobs:
         uses: kubewarden/notify-policy-hub@main
         with:
           USERNAME: chimera-kube-bot
-          PAT: ${{ inputs.workflow-pat }}        
+          PAT: ${{ secrets.workflow_pat }}
