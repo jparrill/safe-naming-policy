@@ -9,7 +9,7 @@
   # request rejected
   [ "$status" -eq 0 ]
   [ $(expr "$output" : '.*allowed.*false') -ne 0 ]
-  [ $(expr "$output" : ".*The 'ocatopic-pod' pattern is blacklisted*") -ne 0 ]
+  [ $(expr "$output" : ".*The Unsafe pattern provided is blacklisted*") -ne 0 ]
 }
 
 @test "accept because the podName is whitelisted" {
