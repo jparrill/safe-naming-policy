@@ -1,5 +1,4 @@
 SOURCE_FILES := $(shell find . -type f -name '*.go')
-SETTINGS ?= $(shell cat assets/settings.sample.json | jq -c)
 
 build: types_easyjson.go policy.wasm annotated-policy.wasm
 build_local: types_easyjson.go policy-arm.wasm annotated-policy.wasm
@@ -34,9 +33,3 @@ e2e-tests: annotated-policy.wasm
 clean:
 	go clean
 	rm -f policy.wasm annotated-policy.wasm
-
-install:
-	@echo "Loading ClusterAdmissionPolicy into Kubernetes with these Settings:"
-	@echo "$(SETTINGS)"
-	@echo
-	envsubst < assets/deployment/ClusterAdmissionPolicy.yaml 
