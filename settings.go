@@ -5,7 +5,7 @@ import (
 
 	kubewarden "github.com/kubewarden/policy-sdk-go"
 	kp "github.com/kubewarden/policy-sdk-go/protocol"
-	easyjson "github.com/mailru/easyjson"
+	"github.com/mailru/easyjson"
 )
 
 // Valid function validates the case when you recovers the settings.json into an struct

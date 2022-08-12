@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/francoispqt/onelog"
-	corev1 "github.com/kubewarden/k8s-objects/api/core/v1"
+	"github.com/kubewarden/gjson"
 	kubewarden "github.com/kubewarden/policy-sdk-go"
 	kp "github.com/kubewarden/policy-sdk-go/protocol"
 	easyjson "github.com/mailru/easyjson"
@@ -20,6 +20,11 @@ func validate(payload []byte) ([]byte, error) {
 			kubewarden.Code(400))
 	}
 
+	data := gjson.GetBytes(payload, "request.object.metadata.name")
+	podName := data.Str
+	data = gjson.GetBytes(payload, "request.object.metadata.namespace")
+	podNs := data.Str
+
 	// Create a Settings instance from the ValidationRequest object
 	settings, err := NewSettingsFromValidationReq(&validationRequest)
 	if err != nil {
@@ -28,33 +33,22 @@ func validate(payload []byte) ([]byte, error) {
 			kubewarden.Code(400))
 	}
 
-	// Getting the skeleton of a request object
-	podJSON := validationRequest.Request.Object
-
-	// Pod instance inside of pod var
-	pod := &corev1.Pod{}
-	if err := easyjson.Unmarshal([]byte(podJSON), pod); err != nil {
-		return kubewarden.RejectRequest(
-			kubewarden.Message("Cannot decode Pod object"),
-			kubewarden.Code(400))
-	}
-
 	logger.DebugWithFields("validating pod object", func(e onelog.Entry) {
-		e.String("name", pod.Metadata.Name)
-		e.String("namespace", pod.Metadata.Namespace)
+		e.String("name", podName)
+		e.String("namespace", podNs)
 		//		e.String("%s", string(pod))
 	})
 
 	// From here starts the rules validations
 	// Is this the right Namespace?
-	if !(settings.IsThisMyNamespace(pod.Metadata.Namespace)) {
+	if !(settings.IsThisMyNamespace(podNs)) {
 		return kubewarden.AcceptRequest()
 	}
 
 	// The podName is blacklisted?
-	if settings.IsNameUnsafe(pod.Metadata.Name) {
+	if settings.IsNameUnsafe(podName) {
 		logger.InfoWithFields("The pod creation is not allowed by a Kubewarden policy", func(e onelog.Entry) {
-			e.String("name", pod.Metadata.Name)
+			e.String("name", podName)
 			e.String("unsafe_names", strings.Join(settings.UnsafeNames, ","))
 		})
 
@@ -64,9 +58,9 @@ func validate(payload []byte) ([]byte, error) {
 	}
 
 	// The podName is whitelisted?
-	if !(settings.IsNameSafe(pod.Metadata.Name)) {
+	if !(settings.IsNameSafe(podName)) {
 		logger.InfoWithFields("The pod creation is not allowed by a Kubewarden policy", func(e onelog.Entry) {
-			e.String("name", pod.Metadata.Name)
+			e.String("name", podName)
 			e.String("safe_names", strings.Join(settings.SafeNames, ","))
 		})
 
