@@ -20,10 +20,8 @@ func validate(payload []byte) ([]byte, error) {
 			kubewarden.Code(400))
 	}
 
-	data := gjson.GetBytes(payload, "request.object.metadata.name")
-	podName := data.Str
-	data = gjson.GetBytes(payload, "request.object.metadata.namespace")
-	podNs := data.Str
+	podName := gjson.GetBytes(payload, "request.object.metadata.name").Str
+	podNs := gjson.GetBytes(payload, "request.object.metadata.namespace").Str
 
 	// Create a Settings instance from the ValidationRequest object
 	settings, err := NewSettingsFromValidationReq(&validationRequest)

@@ -1,0 +1,22 @@
+apiVersion: policies.kubewarden.io/v1alpha2
+kind: ClusterAdmissionPolicy
+metadata:
+  name: safe-naming-policy
+spec:
+  module: registry://ghcr.io/jparrill/kubewarden-policies/safe-naming-policy:latest
+  mode: protect
+  policyServer: default
+  rules:
+  - apiGroups: [""]
+    apiVersions: ["v1"]
+    resources: ["pods"]
+    operations:
+    - CREATE
+  mutating: false
+  settings:
+    namespace: 'default'
+    unsafe_names:
+      - notsafe-
+      - insecure-
+    safe_names:
+      - ocatopic
