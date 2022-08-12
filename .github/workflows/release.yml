@@ -57,6 +57,21 @@ jobs:
           echo Key signing of policy using cosign
           cosign sign --key cosign.key ${IMMUTABLE_REF}
 
+      - name: Publish Wasm policy artifact to OCI registry with the version tag and 'latest'
+        shell: bash
+        if: ${{ startsWith(github.ref, 'refs/tags/') }}
+        env:
+          COSIGN_EXPERIMENTAL: 1
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+          ANNOTATED_WASM: annotated-policy.wasm
+          OCI_TARGET: ghcr.io/${{ github.repository_owner }}/kubewarden-policies/safe-naming-policy
+        run: |
+          set -ex
+          echo Pushing policy to OCI container registry
+          IMMUTABLE_REF=$(kwctl push -o json ${{ env.ANNOTATED_WASM }} ${{ env.OCI_TARGET }}:latest | jq -r .immutable_ref)
+          echo Key signing of policy using cosign
+          cosign sign --key cosign.key ${IMMUTABLE_REF}
+
       - name: Build Changelog
         id: github_release
         uses: mikepenz/release-changelog-builder-action@v3
