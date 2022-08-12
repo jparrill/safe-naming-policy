@@ -57,12 +57,18 @@ jobs:
           echo Key signing of policy using cosign
           cosign sign --key cosign.key ${IMMUTABLE_REF}
 
+      - name: Build Changelog
+        id: github_release
+        uses: mikepenz/release-changelog-builder-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Create Release
         if: ${{ startsWith(github.ref, 'refs/tags/') }}
         id: create_release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
@@ -81,10 +87,3 @@ jobs:
           asset_path: ${{ env.ANNOTATED_WASM }}
           asset_name: policy.wasm
           asset_content_type: application/wasm
-      -
-        name: Notify policy-hub
-        if: ${{ inputs.workflow-pat != '' && startsWith(github.ref, 'refs/tags/') && !(contains(github.ref, '-alpha') || contains(github.ref, '-beta') || contains(github.ref, '-rc')) }}
-        uses: kubewarden/notify-policy-hub@main
-        with:
-          USERNAME: chimera-kube-bot
-          PAT: ${{ secrets.workflow_pat }}
