@@ -7,6 +7,23 @@ Kubewarden policy which validates the PodName in order to allow and disallow the
 - tinygo
 - kwctl
 
+## Deployment
+
+In order to deploy this policy in K8s, you just need a [K8s cluster](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/) + [Kubewarden](https://docs.kubewarden.io/quick-start#installation). Then you can go to `assets/deployment` folder and execute:
+
+```bash
+kubectl apply -f ClusterAdmissionPolicy-sample.yaml
+```
+
+And if you want to test if it's working, you can use the testing sample pods in the same folder:
+
+- `kubectl apply -f invalidPod.yaml`: Will fail at deployment because of it's blacklisted
+- `kubectl apply -f validPod.yaml`: Will success at deployment because it's whitelisted
+- `kubectl apply -f notListedPod.yaml`: Will fail at deployment because it's not whitelisted
+
+
+**Note:** You could change the `settings` field on the `ClusterAdmissionPolicy-sample.yaml` file in order to fit your needs.
+
 ## Development
 
 - **types_easyjson.go**: Generates the EasyJson types
@@ -47,3 +64,5 @@ To enable the deployment on these processors we will need to do 2 things:
   rustup target add aarch64-apple-darwin
   cargo build --target=aarch64-apple-darwin --release
   ```
+
+  **UPDATE**: PR it's now merged, so in the next release from `v1.1.1` we will have Apple Silicon binaries 🎉🎉🎉
